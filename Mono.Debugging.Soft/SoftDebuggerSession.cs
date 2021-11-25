@@ -250,9 +250,11 @@ namespace Mono.Debugging.Soft
 
 		protected virtual bool ShouldRetryConnection (Exception ex, int attemptNumber)
 		{
-			var sx = ex as SocketException;
-			if (sx != null) {
-				if (sx.ErrorCode == 10061) //connection refused
+			if (ex is AggregateException ae)
+				ex = ae.InnerException;
+
+			if (ex is SocketException sx) {
+				if (sx.ErrorCode == 10061 || sx.ErrorCode == 61) //connection refused
 					return true;
 			}
 			return false;
